@@ -11,17 +11,23 @@
 
 using namespace std;
 
+/**
+ * Display usage for help
+ */
 void displayUsage(char* name) {
 	cerr 	<< "Usage: " << endl
 			<< name << " <host> <port>" << endl
 			<< endl;
 }
 
-int checkArguments(int argc, char* argv[]) {
+/**
+ * Check/validate all argument passed to script
+ */
+bool checkArguments(int argc, char* argv[]) {
 	if (3 != argc) {
 		cerr << "Missing some required arguments !" << endl;
 		displayUsage(argv[0]);
-		return -1;
+		return false;
 	}
 
 	try {
@@ -29,18 +35,19 @@ int checkArguments(int argc, char* argv[]) {
 	} catch (exception e) {
 		cerr << "Port must be an integer !" << endl;
 		displayUsage(argv[0]);
-		return -1;
+		return false;
 	}
 
-	return 0;
+	return true;
 }
 
+/**
+ * Main runner
+ */
 int main(int argc, char* argv[]) {
 
 	// Validate arguments
-	int isValid;
-	isValid = checkArguments(argc, argv);
-	if (0 != isValid) {
+	if (!checkArguments(argc, argv)) {
 		return -1;
 	}
 
@@ -50,17 +57,14 @@ int main(int argc, char* argv[]) {
 
 	cout << "Init client connection" << endl;
 	try {
-		/**
-		 * \var client SocketClientProvider
-		 */
+		// Init provider
 		SocketClientProvider* client = new SocketClientProvider();
-
 		// Resolv target before connect
 		string hostname = client->resolvAddress(host);
 		if (host != hostname) {
 			cout << "Target resolved to " << hostname << endl;
 		}
-
+		// Init connection
 		bool status = client->connection(hostname, port);
 		if(status) {
 			cout << "Connected to " << hostname << ":" << port << endl;

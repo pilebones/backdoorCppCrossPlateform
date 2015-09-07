@@ -33,6 +33,24 @@ SocketClientProvider::SocketClientProvider() {
 	}
 }
 
+/**
+ * Sockets Destructor
+ */
+SocketClientProvider::~SocketClientProvider() {
+    /* Close socket with same function name for each OS (see: macro inside *.h) */
+	closesocket(this->getClientSocket());
+
+	/* Close only on Windows socket extra-setting */
+	#if defined (WIN32)
+		WSACleanup();
+	#endif
+}
+
+/**
+ * Resolv IP to do querying a valid target
+ *
+ * \param string hostname - IP or DNS record must be resolv
+ */
 string SocketClientProvider::resolvAddress(string hostname) {
 	//setup address structure
 	if(-1 == inet_addr(hostname.c_str())) {
@@ -59,7 +77,14 @@ string SocketClientProvider::resolvAddress(string hostname) {
 	return hostname;
 }
 
-bool SocketClientProvider::connection(string hostname,int port) {
+/**
+ * To connect to the following target => host:port
+ *
+ * \param string hostname - target hostname
+ * \param  int port - target port
+ * \return boolean - true if the connection works else false
+ */
+bool SocketClientProvider::connection(string hostname, int port) {
 
 	/* Connection settings */
 	SOCKADDR_IN socketAddrIn;
@@ -80,6 +105,11 @@ bool SocketClientProvider::connection(string hostname,int port) {
 	return false;
 }
 
+/**
+ * Read data from the opened socket
+ *
+ * \return string - data read
+ */
 string SocketClientProvider::readAsString() {
 	char* buffer = this->getBuffer();
     if (0 < recv(this->getClientSocket(), buffer, BUFFER_SIZE, 0)) {
@@ -90,6 +120,9 @@ string SocketClientProvider::readAsString() {
 	return string("");
 }
 
+/**
+ * Put data to the opened socket
+ */
 bool SocketClientProvider::writeAsString(string data) {
 	if(-1 == send(
 		this->getClientSocket(),
@@ -103,46 +136,52 @@ bool SocketClientProvider::writeAsString(string data) {
 	return true;
 }
 
+/**
+ * Getter for the data inside socket's buffer
+ *
+ * \return char* - The data inside buffer
+ */
 char* &SocketClientProvider::getBuffer() {
 	return this->buffer;
 }
 
+/**
+ * Set data inside socket's buffer
+ */
 void SocketClientProvider::setBuffer(char* buffer) {
 	this->buffer = buffer;
 }
 
 /**
- * Sockets Destructor
+ * Getter for the socket
+ *
+ * \return SOCKET the socket
  */
-SocketClientProvider::~SocketClientProvider() {
-    /* Close connection */
-	closesocket(this->getClientSocket());
-
-	#if defined (WIN32)
-		WSACleanup();
-	#endif
-}
-
 SOCKET SocketClientProvider::getClientSocket() {
 	return this->clientSocket;
 }
 
+/**
+ * Setter for the socket
+ * \param SOCKET clientSocket - Init socket
+ */
 void SocketClientProvider::setClientSocket(SOCKET clientSocket) {
 	this->clientSocket = clientSocket;
 }
 
+/**
+ * Getter for the socket addr
+ *
+ * \return SOCKADDR the socket target
+ */
 SOCKADDR SocketClientProvider::getSocketAddr() {
 	return this->socketAddr;
 }
 
+/**
+ * Setter for the socket addr
+ * \param SOCKADDR socketAddr - Init socket target
+ */
 void SocketClientProvider::setSocketAddr(SOCKADDR socketAddr) {
 	this->socketAddr = socketAddr;
 }
-
-/*sockaddr_in SocketClientProvider::getSocketAddrIn() {
-	return this->socketAddrIn;
-}
-
-void SocketClientProvider::setSocketAddrIn(sockaddr_in socketAddrIn) {
-	this->socketAddrIn = socketAddrIn;
-}*/
