@@ -12,7 +12,6 @@
 
 	// Std librairies
 	#include <string>
-	#include <string.h>    //strlen
 	#include <iostream>
 	#include <cstdlib>
 	#include <stdio.h>

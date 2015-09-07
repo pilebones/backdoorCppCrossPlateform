@@ -70,12 +70,12 @@ int main(int argc, char* argv[]) {
 			cout << "Connected to " << hostname << ":" << port << endl;
 
 			string data;
-			/*string data = client->readAsString();
+			string data = client->readAsString();
 			if (0 < data.size()) {
 				cout << "Read : " << endl << data << endl;
 			} else {
 				cout << "Nothing to read" << endl;
-			}*/
+			}
 
 			string raw = "GET / HTTP/1.1\r\n"
 					"Host: www.mickael-franc.fr\r\n"

@@ -2,7 +2,7 @@
  * SocketClientProvider.cpp
  *
  *  Created on: 3 sept. 2015
- *      Author: Renegade
+ *      Author: pilebones
  *
  * @see http://sdz.tdct.org/sdz/les-sockets.html
  * @see http://c.developpez.com/cours/sockets-c-cpp-demystifies/
@@ -112,6 +112,7 @@ bool SocketClientProvider::connection(string hostname, int port) {
  */
 string SocketClientProvider::readAsString() {
 	char* buffer = this->getBuffer();
+	// TODO : READ ALL DATA AND CLEAN NULL CHAR
     if (0 < recv(this->getClientSocket(), buffer, BUFFER_SIZE, 0)) {
 		return string(buffer);
 	}
@@ -127,7 +128,7 @@ bool SocketClientProvider::writeAsString(string data) {
 	if(-1 == send(
 		this->getClientSocket(),
 		data.c_str(),
-		strlen(data.c_str()),
+		data.length(),
 		0
 	) ) {
 		perror("Send failed. Error");
