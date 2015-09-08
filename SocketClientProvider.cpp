@@ -105,6 +105,14 @@ bool SocketClientProvider::connection(string hostname, int port) {
 	return false;
 }
 
+/*void SocketClientProvider::setNonBlock() {
+    int flags;
+    int socket = this->getClientSocket();
+    flags = fcntl(socket, F_GETFL, 0);
+    assert(flags != -1);
+    fcntl(socket, F_SETFL, flags | O_NONBLOCK);
+}*/
+
 /**
  * Read data from the opened socket
  *
@@ -112,13 +120,42 @@ bool SocketClientProvider::connection(string hostname, int port) {
  */
 string SocketClientProvider::readAsString() {
 	char* buffer = this->getBuffer();
-	// TODO : READ ALL DATA AND CLEAN NULL CHAR
-    if (0 < recv(this->getClientSocket(), buffer, BUFFER_SIZE, 0)) {
-		return string(buffer);
-	}
+	string response;
+	signed int nbBytes = 0;
 
-    perror("Receive failed. Error");
-	return string("");
+	do {
+		nbBytes = recv(this->getClientSocket(), buffer, 1, 0); // read bytes by bytes until the end
+		// cout << "nb bytes : " << nbBytes << endl;
+		if (-1 == nbBytes) { // There is an error => what it is
+			int errorNumber = errno; // Save errno to avoid data lost
+			switch (errorNumber) {
+				#if defined (WIN32) // If windows OS used
+					case WSAEWOULDBLOCK: // Socket is NONBLOCK and there is no data available
+						cout << "WSAEWOULDBLOCK" << endl;
+					break;
+				#elif defined (linux) // Else unix OS used
+					case EWOULDBLOCK: // Socket is NONBLOCK and there is no data available
+						cout << "WSAEWOULDBLOCK" << endl;
+					break;
+				#endif
+				case EAGAIN: // There is no data available for reading on a non-blocking socket => should run the recv() again
+					cout << "EAGAIN" << endl;
+					break;
+				case EINTR: // An interrupt (signal) has been catched => should be ingore in most cases
+					cout << "EINTR" << endl;
+					break;
+				default:
+					perror("Receive failed. Error");
+					// socket has an error, no valid anymore
+					break;
+		   }
+		} else if (nbBytes > 0) { // Data has been received
+			// cout << buffer << endl;
+			response += string(buffer);
+		}
+	} while (0 < nbBytes);
+
+	return response;
 }
 
 /**

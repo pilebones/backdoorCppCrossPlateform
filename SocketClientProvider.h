@@ -17,7 +17,7 @@
 	#include <stdio.h>
 
 	// defined usefull constant & macro
-	#define BUFFER_SIZE 2048
+	#define BUFFER_SIZE 128
 
 	// Cross plateform compatibility
 	#if defined (WIN32) // If windows OS used

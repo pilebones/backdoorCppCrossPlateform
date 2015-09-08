@@ -67,25 +67,23 @@ int main(int argc, char* argv[]) {
 		// Init connection
 		bool status = client->connection(hostname, port);
 		if(status) {
-			cout << "Connected to " << hostname << ":" << port << endl;
+			cout << "Connected to " << hostname << ":" << port << endl << endl;
 
-			string data;
-			string data = client->readAsString();
+			string data = client->readAsString(); // Read first response after connection
 			if (0 < data.size()) {
-				cout << "Read : " << endl << data << endl;
-			} else {
-				cout << "Nothing to read" << endl;
+				cout << endl << data << endl;
 			}
 
+			// Send request
 			string raw = "GET / HTTP/1.1\r\n"
-					"Host: www.mickael-franc.fr\r\n"
+					"Host: www.google.fr\r\n"
 					"\r\n";
 
 			bool isSent = client->writeAsString(raw);
 			if (true == isSent) {
-				cout << "Write : " << endl << raw << endl;
+				cout << "Data sent : " << endl << raw << endl;
 			} else {
-				cout << "Unable to write : " << endl << raw << endl;
+				cout << "Unable to send : " << endl << raw << endl;
 			}
 
 			data = client->readAsString();
