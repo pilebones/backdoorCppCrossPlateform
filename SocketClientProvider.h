@@ -15,7 +15,8 @@
         SocketClientProvider(int timeout = 50);
 		virtual ~SocketClientProvider();
 
-		bool connection(string host,int port);
+        bool connection(string host,int port);
+        template <class T> void setTimeout(SOCKET handle, T timeout);
 	};
 
 #endif /* SOCKETCLIENTPROVIDER_H_ */

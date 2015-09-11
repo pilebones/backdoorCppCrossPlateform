@@ -26,14 +26,12 @@ SocketClientProvider::SocketClientProvider(int timeout) : SocketProvider() {
         // Set up the socket timeout
         #if defined(OS_Windows)
             timeout = timeout * 1000; // Time out in millisecond for Windows
-            setsockopt(SocketProvider::getSocket(), SOL_SOCKET, SO_RCVTIMEO,(const char *)&timeout, sizeof(timeout) );
-            setsockopt(SocketProvider::getSocket(), SOL_SOCKET, SO_SNDTIMEO,(const char *)&timeout, sizeof(timeout) );
+            this->setTimeout(this->getSocket(), timeout);
         #elif defined (OS_Linux)
             struct timeval tv;
             tv.tv_sec = timeout;
             tv.tv_usec = 0;
-            setsockopt(this->getClientSocket(), SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv, sizeof(timeout) );
-            setsockopt(this->getClientSocket(), SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv, sizeof(timeout) );
+            this->setTimeout(this->getSocket(), tv);
         #endif
 		// Set up the file descriptor set.
 		fd_set fds;
@@ -42,6 +40,14 @@ SocketClientProvider::SocketClientProvider(int timeout) : SocketProvider() {
 	} else {
 		throw "Unable to init socket";
 	}
+}
+
+/**
+ * Function's template to simplify call to setsockopt() across OS to define the socket timeout
+ */
+template <class T> void SocketClientProvider::setTimeout(SOCKET handle, T timeout){
+    setsockopt(handle, SOL_SOCKET, SO_RCVTIMEO,(const char *)&timeout, sizeof(timeout) );
+    setsockopt(handle, SOL_SOCKET, SO_SNDTIMEO,(const char *)&timeout, sizeof(timeout) );
 }
 
 /**
