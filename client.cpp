@@ -6,8 +6,9 @@
 //============================================================================
 
 #include "SocketClientProvider.h"
-#include <iostream>
 #include <string>
+
+#define SOCKET_TIMEOUT 2
 
 using namespace std;
 
@@ -58,7 +59,7 @@ int main(int argc, char* argv[]) {
 	cout << "Init client connection" << endl;
 	try {
 		// Init provider
-		SocketClientProvider* client = new SocketClientProvider();
+		SocketClientProvider* client = new SocketClientProvider(SOCKET_TIMEOUT);
 		// Resolv target before connect
 		string hostname = client->resolvAddress(host);
 		if (host != hostname) {
@@ -69,7 +70,8 @@ int main(int argc, char* argv[]) {
 		if(status) {
 			cout << "Connected to " << hostname << ":" << port << endl << endl;
 
-			string data = client->readAsString(); // Read first response after connection
+			string data;
+			data = client->readAsString(); // Read first response after connection
 			if (0 < data.size()) {
 				cout << endl << data << endl;
 			}
@@ -77,10 +79,11 @@ int main(int argc, char* argv[]) {
 			// Send request
 			string raw = "GET / HTTP/1.1\r\n"
 					"Host: www.google.fr\r\n"
+					"Connection: close\r\n"
 					"\r\n";
 
 			bool isSent = client->writeAsString(raw);
-			if (true == isSent) {
+			if (isSent) {
 				cout << "Data sent : " << endl << raw << endl;
 			} else {
 				cout << "Unable to send : " << endl << raw << endl;
@@ -100,6 +103,5 @@ int main(int argc, char* argv[]) {
 	}
 
 	cout << "Program ending.." << endl;
-	// getchar();
 	return 0;
 }

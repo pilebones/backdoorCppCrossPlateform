@@ -9,25 +9,34 @@
  * @see http://sylvainmarechal.chez-alice.fr/prog/win32/socket/socket.html
  */
 
+#include <fcntl.h>
 #include "SocketClientProvider.h"
 
 /**
  * Sockets Constructor
  */
-SocketClientProvider::SocketClientProvider() {
+SocketClientProvider::SocketClientProvider(int timeout) {
 
-	#if defined (WIN32)
+	#if defined(OS_Windows)
 		WSADATA WSAData;
 		int error = WSAStartup(MAKEWORD(2,2), &WSAData);
-	#else
+	#elif defined(OS_Linux)
 		int error = 0;
 	#endif
-
-	this->buffer = (char*) malloc(BUFFER_SIZE * sizeof(char));
 
 	if(!error) {
 		/* Create Socket */
 		this->setClientSocket(socket(AF_INET, SOCK_STREAM, 0));
+
+		#if defined(OS_Windows)
+			// TODO: Implement timeout setter for OS_Windows with D_WORD param for setsockopt
+		#elif defined(OS_Linux)
+			struct timeval tv;
+			tv.tv_sec = timeout;
+			tv.tv_usec = 0;
+			setsockopt(this->getClientSocket(), SOL_SOCKET, SO_RCVTIMEO,(char *)&tv,sizeof(struct timeval));
+			setsockopt(this->getClientSocket(), SOL_SOCKET, SO_SNDTIMEO,(char *)&tv,sizeof(struct timeval));
+		#endif
 	} else {
 		throw "Unable to init socket";
 	}
@@ -41,7 +50,7 @@ SocketClientProvider::~SocketClientProvider() {
 	closesocket(this->getClientSocket());
 
 	/* Close only on Windows socket extra-setting */
-	#if defined (WIN32)
+	#if defined(OS_Windows)
 		WSACleanup();
 	#endif
 }
@@ -105,55 +114,60 @@ bool SocketClientProvider::connection(string hostname, int port) {
 	return false;
 }
 
-/*void SocketClientProvider::setNonBlock() {
-    int flags;
-    int socket = this->getClientSocket();
-    flags = fcntl(socket, F_GETFL, 0);
-    assert(flags != -1);
-    fcntl(socket, F_SETFL, flags | O_NONBLOCK);
-}*/
+void SocketClientProvider::setNonBlock() {
+	#if defined(OS_Linux)
+		int flags = fcntl(this->getClientSocket(), F_GETFL, 0);
+		flags |= O_NONBLOCK;
+		fcntl(this->getClientSocket(), F_SETFL, flags);
+	#endif
+}
 
 /**
  * Read data from the opened socket
  *
  * \return string - data read
  */
-string SocketClientProvider::readAsString() {
-	char* buffer = this->getBuffer();
-	string response;
-	signed int nbBytes = 0;
+string SocketClientProvider::readAsString(bool nonBlockingMode) {
 
-	do {
-		nbBytes = recv(this->getClientSocket(), buffer, 1, 0); // read bytes by bytes until the end
-		// cout << "nb bytes : " << nbBytes << endl;
-		if (-1 == nbBytes) { // There is an error => what it is
+	string response;
+	char buffer[BUFFER_POOL_LENGHT];
+	ssize_t nbBytes = 0;
+	bool toContinue = true;
+
+	if (nonBlockingMode) {
+		this->setNonBlock();
+	}
+
+	while (toContinue) {
+		// 	nbBytes = recv(this->getClientSocket(), buffer, 1, 0); // Previously : read bytes by bytes until the end
+		nbBytes = recv(this->getClientSocket(), buffer, sizeof(buffer) - 1, 0); // Blocking sys-call by default
+		if (0 == nbBytes) { // No data receive
+			toContinue = false;
+		} else if (nbBytes > 0) { // Data has been received
+			buffer[nbBytes] = '\0'; // Terminate buffer
+			response += string(buffer);
+		} else { // There is an error => what it is
 			int errorNumber = errno; // Save errno to avoid data lost
 			switch (errorNumber) {
-				#if defined (WIN32) // If windows OS used
-					case WSAEWOULDBLOCK: // Socket is NONBLOCK and there is no data available
-						cout << "WSAEWOULDBLOCK" << endl;
+				#if defined(OS_Windows)
+				case WSAEWOULDBLOCK: // Socket is NONBLOCK and there is no data available
+					toContinue = false;
 					break;
-				#elif defined (linux) // Else unix OS used
-					case EWOULDBLOCK: // Socket is NONBLOCK and there is no data available
-						cout << "WSAEWOULDBLOCK" << endl;
+                #elif defined (OS_Linux)
+				case EWOULDBLOCK: // There is no data available for reading on a non-blocking socket => should run the recv() again
+					toContinue = false;
 					break;
-				#endif
-				case EAGAIN: // There is no data available for reading on a non-blocking socket => should run the recv() again
-					cout << "EAGAIN" << endl;
-					break;
+                #endif
 				case EINTR: // An interrupt (signal) has been catched => should be ingore in most cases
-					cout << "EINTR" << endl;
 					break;
-				default:
-					perror("Receive failed. Error");
-					// socket has an error, no valid anymore
+				default: // socket has an error, no valid anymore
+					cerr << "Error n°" << errorNumber << endl;
+					perror("Receive failed. ");
+					toContinue = false;
 					break;
-		   }
-		} else if (nbBytes > 0) { // Data has been received
-			// cout << buffer << endl;
-			response += string(buffer);
+			}
 		}
-	} while (0 < nbBytes);
+	}
 
 	return response;
 }
@@ -172,22 +186,6 @@ bool SocketClientProvider::writeAsString(string data) {
 		return false;
 	}
 	return true;
-}
-
-/**
- * Getter for the data inside socket's buffer
- *
- * \return char* - The data inside buffer
- */
-char* &SocketClientProvider::getBuffer() {
-	return this->buffer;
-}
-
-/**
- * Set data inside socket's buffer
- */
-void SocketClientProvider::setBuffer(char* buffer) {
-	this->buffer = buffer;
 }
 
 /**

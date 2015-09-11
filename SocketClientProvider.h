@@ -17,14 +17,20 @@
 	#include <stdio.h>
 
 	// defined usefull constant & macro
-	#define BUFFER_SIZE 128
+	#define BUFFER_POOL_LENGHT 256
+
+	#ifdef __unix__
+		#define OS_Linux
+	#elif defined(_WIN32) || defined(WIN32)
+		#define OS_Windows
+	#endif
 
 	// Cross plateform compatibility
-	#if defined (WIN32) // If windows OS used
+	#if defined(OS_Windows)
 	    #include <winsock2.h>
 	    #pragma comment(lib, "ws2_32.lib")
 		typedef int socklen_t;
-	#elif defined (linux) // Else unix OS used
+	#elif defined(OS_Linux)
 	    #include <sys/types.h>
 	    #include <sys/socket.h>
 	    #include <netinet/in.h>
@@ -46,9 +52,8 @@
 	    SOCKET clientSocket;
 	    SOCKADDR socketAddr;
 	    SOCKADDR_IN socketAddrIn;
-	    char* buffer;
 	public:
-		SocketClientProvider();
+		SocketClientProvider(int timeout = 50);
 		virtual ~SocketClientProvider();
 
 		SOCKET getClientSocket();
@@ -57,14 +62,13 @@
 		SOCKADDR getSocketAddr();
 		void setSocketAddr(SOCKADDR socketAddr);
 
-		char* & getBuffer();
-		void setBuffer(char* buffer);
-
-		string readAsString();
+		string readAsString(bool nonBlockingMode = false);
 		bool writeAsString(string data);
 
 		bool connection(string host,int port);
 		string resolvAddress(string hostname);
+
+		void setNonBlock();
 	};
 
 #endif /* SOCKETCLIENTPROVIDER_H_ */
