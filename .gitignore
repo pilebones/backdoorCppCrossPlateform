@@ -1,3 +1,4 @@
 .project
 .cproject
 .idea
+*.exe

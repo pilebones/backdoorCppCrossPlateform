@@ -4,9 +4,6 @@
  *  Created on: 3 sept. 2015
  *      Author: pilebones
  *
- * @see http://sdz.tdct.org/sdz/les-sockets.html
- * @see http://c.developpez.com/cours/sockets-c-cpp-demystifies/
- * @see http://sylvainmarechal.chez-alice.fr/prog/win32/socket/socket.html
  */
 
 #include <fcntl.h>
@@ -14,29 +11,36 @@
 
 /**
  * Sockets Constructor
+ * \param int timeout - time in second
  */
 SocketClientProvider::SocketClientProvider(int timeout) {
 
-	#if defined(OS_Windows)
+    #if defined(OS_Windows)
 		WSADATA WSAData;
 		int error = WSAStartup(MAKEWORD(2,2), &WSAData);
 	#elif defined(OS_Linux)
 		int error = 0;
 	#endif
-
 	if(!error) {
-		/* Create Socket */
+		// Create the socket
 		this->setClientSocket(socket(AF_INET, SOCK_STREAM, 0));
 
-		#if defined(OS_Windows)
-			// TODO: Implement timeout setter for OS_Windows with D_WORD param for setsockopt
-		#elif defined(OS_Linux)
-			struct timeval tv;
-			tv.tv_sec = timeout;
-			tv.tv_usec = 0;
-			setsockopt(this->getClientSocket(), SOL_SOCKET, SO_RCVTIMEO,(char *)&tv,sizeof(struct timeval));
-			setsockopt(this->getClientSocket(), SOL_SOCKET, SO_SNDTIMEO,(char *)&tv,sizeof(struct timeval));
-		#endif
+        // Set up the socket timeout
+        #if defined(OS_Windows)
+            timeout = timeout * 1000; // Time out in millisecond for Windows
+            setsockopt(this->getClientSocket(), SOL_SOCKET, SO_RCVTIMEO,(const char *)&timeout, sizeof(timeout) );
+            setsockopt(this->getClientSocket(), SOL_SOCKET, SO_SNDTIMEO,(const char *)&timeout, sizeof(timeout) );
+        #elif defined (OS_Linux)
+            struct timeval tv;
+            tv.tv_sec = timeout;
+            tv.tv_usec = 0;
+            setsockopt(this->getClientSocket(), SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv, sizeof(timeout) );
+            setsockopt(this->getClientSocket(), SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv, sizeof(timeout) );
+        #endif
+		// Set up the file descriptor set.
+		fd_set fds;
+		FD_ZERO(&fds);
+		FD_SET(this->getClientSocket(), &fds) ;
 	} else {
 		throw "Unable to init socket";
 	}
@@ -150,6 +154,9 @@ string SocketClientProvider::readAsString(bool nonBlockingMode) {
 			int errorNumber = errno; // Save errno to avoid data lost
 			switch (errorNumber) {
 				#if defined(OS_Windows)
+                case 0: // No data receive on Windows
+                    toContinue = false;
+                    break;
 				case WSAEWOULDBLOCK: // Socket is NONBLOCK and there is no data available
 					toContinue = false;
 					break;
@@ -158,10 +165,10 @@ string SocketClientProvider::readAsString(bool nonBlockingMode) {
 					toContinue = false;
 					break;
                 #endif
-				case EINTR: // An interrupt (signal) has been catched => should be ingore in most cases
-					break;
-				default: // socket has an error, no valid anymore
-					cerr << "Error n°" << errorNumber << endl;
+                case EINTR: // An interrupt (signal) has been catched => should be ingore in most cases
+                    break;
+                default: // socket has an error, no valid anymore
+					cerr << "Error number : " << errorNumber << "(" << nbBytes << " bytes receive)" << endl;
 					perror("Receive failed. ");
 					toContinue = false;
 					break;
