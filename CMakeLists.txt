@@ -5,7 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
     client.cpp
-    SockerProvider.h
+    SocketProvider.h
     SocketProvider.cpp
     SocketClientProvider.cpp
     SocketClientProvider.h
