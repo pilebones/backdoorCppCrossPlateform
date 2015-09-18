@@ -38,7 +38,7 @@ SocketClientProvider::SocketClientProvider(int timeout) : SocketProvider() {
 		FD_ZERO(&fds);
 		FD_SET(SocketProvider::getSocket(), &fds) ;
 	} else {
-		throw "Unable to init socket";
+		throw new logic_error("Unable to init socket");
 	}
 }
 

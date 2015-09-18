@@ -5,7 +5,6 @@
 #ifndef CPPCROSSPLATEFORMSOCKETPROVIDER_SOCKETPROVIDER_H
 #define CPPCROSSPLATEFORMSOCKETPROVIDER_SOCKETPROVIDER_H
 
-using namespace std;
 #define BUFFER_POOL_LENGHT 256
 
 #ifdef __unix__
@@ -20,6 +19,7 @@ using namespace std;
 #include <cstdlib>
 #include <stdio.h>
 #include <fcntl.h>
+#include <stdexcept>
 
 // Cross plateform compatibility
 #if defined(OS_Windows)
@@ -42,6 +42,8 @@ using namespace std;
     typedef struct sockaddr_in SOCKADDR_IN;
     typedef struct sockaddr SOCKADDR;
 #endif
+
+using namespace std;
 
 class SocketProvider {
     private:

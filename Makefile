@@ -123,6 +123,33 @@ main/fast:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+core/cli/Interface.o: core/cli/Interface.cpp.o
+
+.PHONY : core/cli/Interface.o
+
+# target to build an object file
+core/cli/Interface.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/cli/Interface.cpp.o
+.PHONY : core/cli/Interface.cpp.o
+
+core/cli/Interface.i: core/cli/Interface.cpp.i
+
+.PHONY : core/cli/Interface.i
+
+# target to preprocess a source file
+core/cli/Interface.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/cli/Interface.cpp.i
+.PHONY : core/cli/Interface.cpp.i
+
+core/cli/Interface.s: core/cli/Interface.cpp.s
+
+.PHONY : core/cli/Interface.s
+
+# target to generate assembly for a file
+core/cli/Interface.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/cli/Interface.cpp.s
+.PHONY : core/cli/Interface.cpp.s
+
 core/socket/SocketClientProvider.o: core/socket/SocketClientProvider.cpp.o
 
 .PHONY : core/socket/SocketClientProvider.o
@@ -267,6 +294,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... main"
+	@echo "... core/cli/Interface.o"
+	@echo "... core/cli/Interface.i"
+	@echo "... core/cli/Interface.s"
 	@echo "... core/socket/SocketClientProvider.o"
 	@echo "... core/socket/SocketClientProvider.i"
 	@echo "... core/socket/SocketClientProvider.s"
