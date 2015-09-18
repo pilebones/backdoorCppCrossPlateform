@@ -2,3 +2,6 @@
 .cproject
 .idea
 *.exe
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake

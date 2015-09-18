@@ -111,125 +111,152 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named cppCrossPlateformSocketProvider
+# Target rules for targets named main
 
 # Build rule for target.
-cppCrossPlateformSocketProvider: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 cppCrossPlateformSocketProvider
-.PHONY : cppCrossPlateformSocketProvider
+main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 main
+.PHONY : main
 
 # fast build rule for target.
-cppCrossPlateformSocketProvider/fast:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/build
-.PHONY : cppCrossPlateformSocketProvider/fast
+main/fast:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+.PHONY : main/fast
 
-SocketClientProvider.o: SocketClientProvider.cpp.o
+core/socket/SocketClientProvider.o: core/socket/SocketClientProvider.cpp.o
 
-.PHONY : SocketClientProvider.o
-
-# target to build an object file
-SocketClientProvider.cpp.o:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketClientProvider.cpp.o
-.PHONY : SocketClientProvider.cpp.o
-
-SocketClientProvider.i: SocketClientProvider.cpp.i
-
-.PHONY : SocketClientProvider.i
-
-# target to preprocess a source file
-SocketClientProvider.cpp.i:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketClientProvider.cpp.i
-.PHONY : SocketClientProvider.cpp.i
-
-SocketClientProvider.s: SocketClientProvider.cpp.s
-
-.PHONY : SocketClientProvider.s
-
-# target to generate assembly for a file
-SocketClientProvider.cpp.s:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketClientProvider.cpp.s
-.PHONY : SocketClientProvider.cpp.s
-
-SocketProvider.o: SocketProvider.cpp.o
-
-.PHONY : SocketProvider.o
+.PHONY : core/socket/SocketClientProvider.o
 
 # target to build an object file
-SocketProvider.cpp.o:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketProvider.cpp.o
-.PHONY : SocketProvider.cpp.o
+core/socket/SocketClientProvider.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketClientProvider.cpp.o
+.PHONY : core/socket/SocketClientProvider.cpp.o
 
-SocketProvider.i: SocketProvider.cpp.i
+core/socket/SocketClientProvider.i: core/socket/SocketClientProvider.cpp.i
 
-.PHONY : SocketProvider.i
+.PHONY : core/socket/SocketClientProvider.i
 
 # target to preprocess a source file
-SocketProvider.cpp.i:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketProvider.cpp.i
-.PHONY : SocketProvider.cpp.i
+core/socket/SocketClientProvider.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketClientProvider.cpp.i
+.PHONY : core/socket/SocketClientProvider.cpp.i
 
-SocketProvider.s: SocketProvider.cpp.s
+core/socket/SocketClientProvider.s: core/socket/SocketClientProvider.cpp.s
 
-.PHONY : SocketProvider.s
+.PHONY : core/socket/SocketClientProvider.s
 
 # target to generate assembly for a file
-SocketProvider.cpp.s:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketProvider.cpp.s
-.PHONY : SocketProvider.cpp.s
+core/socket/SocketClientProvider.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketClientProvider.cpp.s
+.PHONY : core/socket/SocketClientProvider.cpp.s
 
-SocketServerProvider.o: SocketServerProvider.cpp.o
+core/socket/SocketProvider.o: core/socket/SocketProvider.cpp.o
 
-.PHONY : SocketServerProvider.o
+.PHONY : core/socket/SocketProvider.o
 
 # target to build an object file
-SocketServerProvider.cpp.o:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketServerProvider.cpp.o
-.PHONY : SocketServerProvider.cpp.o
+core/socket/SocketProvider.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketProvider.cpp.o
+.PHONY : core/socket/SocketProvider.cpp.o
 
-SocketServerProvider.i: SocketServerProvider.cpp.i
+core/socket/SocketProvider.i: core/socket/SocketProvider.cpp.i
 
-.PHONY : SocketServerProvider.i
+.PHONY : core/socket/SocketProvider.i
 
 # target to preprocess a source file
-SocketServerProvider.cpp.i:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketServerProvider.cpp.i
-.PHONY : SocketServerProvider.cpp.i
+core/socket/SocketProvider.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketProvider.cpp.i
+.PHONY : core/socket/SocketProvider.cpp.i
 
-SocketServerProvider.s: SocketServerProvider.cpp.s
+core/socket/SocketProvider.s: core/socket/SocketProvider.cpp.s
 
-.PHONY : SocketServerProvider.s
+.PHONY : core/socket/SocketProvider.s
 
 # target to generate assembly for a file
-SocketServerProvider.cpp.s:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/SocketServerProvider.cpp.s
-.PHONY : SocketServerProvider.cpp.s
+core/socket/SocketProvider.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketProvider.cpp.s
+.PHONY : core/socket/SocketProvider.cpp.s
 
-client.o: client.cpp.o
+core/socket/SocketServerProvider.o: core/socket/SocketServerProvider.cpp.o
 
-.PHONY : client.o
+.PHONY : core/socket/SocketServerProvider.o
 
 # target to build an object file
-client.cpp.o:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/client.cpp.o
-.PHONY : client.cpp.o
+core/socket/SocketServerProvider.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketServerProvider.cpp.o
+.PHONY : core/socket/SocketServerProvider.cpp.o
 
-client.i: client.cpp.i
+core/socket/SocketServerProvider.i: core/socket/SocketServerProvider.cpp.i
 
-.PHONY : client.i
+.PHONY : core/socket/SocketServerProvider.i
 
 # target to preprocess a source file
-client.cpp.i:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/client.cpp.i
-.PHONY : client.cpp.i
+core/socket/SocketServerProvider.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketServerProvider.cpp.i
+.PHONY : core/socket/SocketServerProvider.cpp.i
 
-client.s: client.cpp.s
+core/socket/SocketServerProvider.s: core/socket/SocketServerProvider.cpp.s
 
-.PHONY : client.s
+.PHONY : core/socket/SocketServerProvider.s
 
 # target to generate assembly for a file
-client.cpp.s:
-	$(MAKE) -f CMakeFiles/cppCrossPlateformSocketProvider.dir/build.make CMakeFiles/cppCrossPlateformSocketProvider.dir/client.cpp.s
-.PHONY : client.cpp.s
+core/socket/SocketServerProvider.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/socket/SocketServerProvider.cpp.s
+.PHONY : core/socket/SocketServerProvider.cpp.s
+
+core/utils/Array.o: core/utils/Array.cpp.o
+
+.PHONY : core/utils/Array.o
+
+# target to build an object file
+core/utils/Array.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/utils/Array.cpp.o
+.PHONY : core/utils/Array.cpp.o
+
+core/utils/Array.i: core/utils/Array.cpp.i
+
+.PHONY : core/utils/Array.i
+
+# target to preprocess a source file
+core/utils/Array.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/utils/Array.cpp.i
+.PHONY : core/utils/Array.cpp.i
+
+core/utils/Array.s: core/utils/Array.cpp.s
+
+.PHONY : core/utils/Array.s
+
+# target to generate assembly for a file
+core/utils/Array.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/core/utils/Array.cpp.s
+.PHONY : core/utils/Array.cpp.s
+
+main.o: main.cpp.o
+
+.PHONY : main.o
+
+# target to build an object file
+main.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.o
+.PHONY : main.cpp.o
+
+main.i: main.cpp.i
+
+.PHONY : main.i
+
+# target to preprocess a source file
+main.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.i
+.PHONY : main.cpp.i
+
+main.s: main.cpp.s
+
+.PHONY : main.s
+
+# target to generate assembly for a file
+main.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -239,19 +266,22 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... cppCrossPlateformSocketProvider"
-	@echo "... SocketClientProvider.o"
-	@echo "... SocketClientProvider.i"
-	@echo "... SocketClientProvider.s"
-	@echo "... SocketProvider.o"
-	@echo "... SocketProvider.i"
-	@echo "... SocketProvider.s"
-	@echo "... SocketServerProvider.o"
-	@echo "... SocketServerProvider.i"
-	@echo "... SocketServerProvider.s"
-	@echo "... client.o"
-	@echo "... client.i"
-	@echo "... client.s"
+	@echo "... main"
+	@echo "... core/socket/SocketClientProvider.o"
+	@echo "... core/socket/SocketClientProvider.i"
+	@echo "... core/socket/SocketClientProvider.s"
+	@echo "... core/socket/SocketProvider.o"
+	@echo "... core/socket/SocketProvider.i"
+	@echo "... core/socket/SocketProvider.s"
+	@echo "... core/socket/SocketServerProvider.o"
+	@echo "... core/socket/SocketServerProvider.i"
+	@echo "... core/socket/SocketServerProvider.s"
+	@echo "... core/utils/Array.o"
+	@echo "... core/utils/Array.i"
+	@echo "... core/utils/Array.s"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 
