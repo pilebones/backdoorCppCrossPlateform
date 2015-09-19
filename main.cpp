@@ -6,6 +6,7 @@
 //============================================================================
 
 #include <string>
+#include <iostream>
 #include "core/cli/Interface.h"
 #include "core/socket/SocketClientProvider.h"
 #include "core/socket/SocketServerProvider.h"
@@ -54,22 +55,46 @@ int main(int argc, const char** argv) {
                     cout << endl << data << endl;
                 }
 
-                // Send request
-                string raw = "GET / HTTP/1.1\r\n"
-                        "Host: www.google.fr\r\n"
+                cout << "Please input what you want to send..." << endl;
+                cout << "> ";
+
+                /*
+                char raw[1024];
+                while(cin.getline(raw, sizeof(raw))) {    // get message from stdin
+                */
+                string raw;
+                while(getline(cin, raw)) {    // get message from stdin
+                    cin.clear();
+
+                    /*
+                    int lengthOfBytes = raw.length()+1;
+                    char * ch = new char [lengthOfBytes ];
+                    std::strcpy (ch, raw.c_str());
+                    */
+
+                    // Send request for testing
+                    /*
+                    raw = "GET / HTTP/1.1\r\n"
+                        "Host: " + host + "\r\n"
                         "Connection: close\r\n"
                         "\r\n";
+                    */
 
-                bool isSent = client->writeAsString(raw);
-                if (isSent) {
-                    cout << "Data sent : " << endl << raw << endl;
-                } else {
-                    cout << "Unable to send : " << endl << raw << endl;
-                }
+                    bool isSent = client->writeAsString(raw);
+                    if (!isSent) {
+                        cerr << "Unable to send : " << endl << raw << endl;
+                        break;
+                    } else {
+                        if (verbose) cout << raw << endl;
+                    }
 
-                data = client->readAsString();
-                if (0 < data.size()) {
-                    cout << data << endl;
+                    data.clear();
+                    data = client->readAsString();
+                    if (0 < data.size()) {
+                        cout << data << endl;
+                    }
+
+                    cout << "> ";
                 }
 
                 delete client;
