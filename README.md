@@ -1,4 +1,4 @@
-# backdoorCppCrossPlateform (previously: cppCrossPlateformSocketProvider)
+# backdoorCppCrossPlateform
 
 _/!\ Work in progress, not a stable release /!\_
 
