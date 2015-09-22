@@ -1,8 +1,8 @@
 //============================================================================
 // Name        : main.cpp
 // Author      : pilebones
-// Version     :
-// Description : Socket client C++, Ansi-style
+// Version     : 0.2
+// Description : backdoorCppCrossPlateform C++, Ansi-style
 //============================================================================
 
 #include <string>
@@ -58,19 +58,13 @@ int main(int argc, const char** argv) {
                 cout << "Please input what you want to send..." << endl;
                 cout << "> ";
 
-                /*
-                char raw[1024];
-                while(cin.getline(raw, sizeof(raw))) {    // get message from stdin
-                */
                 string raw;
+                char const crlf[] = "\x0D\x0A";
                 while(getline(cin, raw)) {    // get message from stdin
+                    // Clean properly stdin
                     cin.clear();
-
-                    /*
-                    int lengthOfBytes = raw.length()+1;
-                    char * ch = new char [lengthOfBytes ];
-                    std::strcpy (ch, raw.c_str());
-                    */
+                    //  Ajout du special char CRLF at the end of string for query likes HTTP for example
+                    raw.append(crlf);
 
                     // Send request for testing
                     /*

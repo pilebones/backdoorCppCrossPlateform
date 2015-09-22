@@ -1,5 +1,5 @@
 //
-// Created by Renegade on 11/09/2015.
+// Created by Pilebones on 11/09/2015.
 //
 
 #ifndef CPPCROSSPLATEFORMSOCKETPROVIDER_SOCKETPROVIDER_H

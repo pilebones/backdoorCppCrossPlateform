@@ -2,7 +2,7 @@
  * SocketClientProvider.cpp
  *
  *  Created on: 3 sept. 2015
- *      Author: pilebones
+ *      Author: Pilebones
  */
 
 #include "SocketClientProvider.h"
