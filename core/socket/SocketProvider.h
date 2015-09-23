@@ -48,17 +48,25 @@ using namespace std;
 class SocketProvider {
     private:
         SOCKET handle;
+        SOCKADDR_IN socketAddrIn;
+        SOCKADDR socketAddr;
     public:
-        SocketProvider();
+        SocketProvider(string hostname, int port);
         virtual ~SocketProvider();
 
         SOCKET getSocket();
         void setSocket(SOCKET handle);
 
+        SOCKADDR_IN getSocketAddrIn();
+        void setSocketAddrIn(SOCKADDR_IN socketAddrIn);
+
+        SOCKADDR getSocketAddr();
+        void setSocketAddr(SOCKADDR socketAddrIn);
+
         string readAsString(bool nonBlockingMode = false);
         bool writeAsString(string data);
 
-        string resolvAddress(string hostname);
+        static string resolvAddress(string hostname);
         void setNonBlock();
 };
 

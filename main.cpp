@@ -1,4 +1,4 @@
-//============================================================================
+//==================core/socket/==========================================================
 // Name        : main.cpp
 // Author      : pilebones
 // Version     : 0.2
@@ -32,20 +32,24 @@ int main(int argc, const char** argv) {
     bool modeListen = cli->isModeListenEnabled();
 
     if (modeListen) {
-        if (verbose) cout << "Init server mode : feature not implemented yet" << endl;
-        return -1;
+        if (verbose) cout << "Init server mode : feature not fully implemented yet work in progress" << endl;
+        // Init provider
+        SocketServerProvider* server = new SocketServerProvider(host, port);
+        server->start();
     } else {
         if (verbose) cout << "Init client mode" << endl;
         try {
-            // Init provider
-            SocketClientProvider* client = new SocketClientProvider(SOCKET_TIMEOUT);
+
             // Resolv target before connect
-            string hostname = client->resolvAddress(host);
+            string hostname = SocketClientProvider::resolvAddress(host);
             if (host != hostname) {
                 cout << "Target resolved to " << hostname << endl;
             }
+
+            // Init provider
+            SocketClientProvider* client = new SocketClientProvider(hostname, port, SOCKET_TIMEOUT);
             // Init connection
-            bool status = client->connection(hostname, port);
+            bool status = client->connection();
             if(status) {
                 cout << "Connected to " << hostname << ":" << port << endl << endl;
 

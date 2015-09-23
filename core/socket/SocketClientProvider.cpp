@@ -11,35 +11,17 @@
  * Sockets Constructor
  * \param int timeout - time in second
  */
-SocketClientProvider::SocketClientProvider(int timeout) : SocketProvider() {
-
-    #if defined(OS_Windows)
-		WSADATA WSAData;
-		int error = WSAStartup(MAKEWORD(2,2), &WSAData);
-	#elif defined(OS_Linux)
-		int error = 0;
+SocketClientProvider::SocketClientProvider(string hostname, int port, int timeout) : SocketProvider(hostname, port) {
+	// Set up the socket timeout
+	#if defined(OS_Windows)
+		timeout = timeout * 1000; // Time out in millisecond for Windows
+		this->setTimeout(this->getSocket(), timeout);
+	#elif defined (OS_Linux)
+		struct timeval tv;
+		tv.tv_sec = timeout;
+		tv.tv_usec = 0;
+		this->setTimeout(this->getSocket(), tv);
 	#endif
-	if(!error) {
-		// Create the socket
-        SocketProvider::setSocket(socket(AF_INET, SOCK_STREAM, 0));
-
-        // Set up the socket timeout
-        #if defined(OS_Windows)
-            timeout = timeout * 1000; // Time out in millisecond for Windows
-            this->setTimeout(this->getSocket(), timeout);
-        #elif defined (OS_Linux)
-            struct timeval tv;
-            tv.tv_sec = timeout;
-            tv.tv_usec = 0;
-            this->setTimeout(this->getSocket(), tv);
-        #endif
-		// Set up the file descriptor set.
-		fd_set fds;
-		FD_ZERO(&fds);
-		FD_SET(SocketProvider::getSocket(), &fds) ;
-	} else {
-		throw new logic_error("Unable to init socket");
-	}
 }
 
 /**
@@ -70,13 +52,10 @@ SocketClientProvider::~SocketClientProvider() {
  * \param  int port - target port
  * \return boolean - true if the connection works else false
  */
-bool SocketClientProvider::connection(string hostname, int port) {
+bool SocketClientProvider::connection() {
 
 	/* Connection settings */
-	SOCKADDR_IN socketAddrIn;
-	socketAddrIn.sin_addr.s_addr	= inet_addr((char*) hostname.c_str());
-	socketAddrIn.sin_family			= AF_INET;
-	socketAddrIn.sin_port			= htons(port);
+	SOCKADDR_IN socketAddrIn = this->getSocketAddrIn();
 
 	/* Try to connect */
 	if(0 == connect(

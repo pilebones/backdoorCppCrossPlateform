@@ -7,7 +7,34 @@
 /**
  * Sockets Constructor
  */
-SocketProvider::SocketProvider() {}
+SocketProvider::SocketProvider(string hostname, int port) {
+
+#if defined(OS_Windows)
+    WSADATA WSAData;
+		int error = WSAStartup(MAKEWORD(2,2), &WSAData);
+#elif defined(OS_Linux)
+    int error = 0;
+#endif
+    if(!error) {
+        // Create the socket
+        SocketProvider::setSocket(socket(AF_INET, SOCK_STREAM, 0));
+
+        // Set up the file descriptor set.
+        fd_set fds;
+        FD_ZERO(&fds);
+        FD_SET(SocketProvider::getSocket(), &fds);
+
+        /* Connection settings */
+        SOCKADDR_IN socketAddrIn;
+        socketAddrIn.sin_addr.s_addr	= inet_addr((char*) hostname.c_str());
+        socketAddrIn.sin_family			= AF_INET;
+        socketAddrIn.sin_port			= htons(port);
+        this->setSocketAddrIn(socketAddrIn);
+
+    } else {
+        throw new logic_error("Unable to init socket");
+    }
+}
 
 /**
  * Sockets Destructor
@@ -137,4 +164,37 @@ SOCKET SocketProvider::getSocket() {
  */
 void SocketProvider::setSocket(SOCKET handle) {
     this->handle = handle;
+}
+/**
+ * Getter for the socket addr in
+ *
+ * \return SOCKADDR_IN the socket
+ */
+SOCKADDR_IN SocketProvider::getSocketAddrIn() {
+    return this->socketAddrIn;
+}
+
+/**
+ * Setter for the socket
+ * \param SOCKADDR_IN socketAddrIn - Init socket addr in
+ */
+void SocketProvider::setSocketAddrIn(SOCKADDR_IN socketAddrIn) {
+    this->socketAddrIn = socketAddrIn;
+}
+
+/**
+ * Getter for the socket addr in
+ *
+ * \return SOCKADDR_IN the socket
+ */
+SOCKADDR SocketProvider::getSocketAddr() {
+    return this->socketAddr;
+}
+
+/**
+ * Setter for the socket
+ * \param SOCKADDR socketAddr - Init socket addr
+ */
+void SocketProvider::setSocketAddr(SOCKADDR socketAddr) {
+    this->socketAddr = socketAddr;
 }

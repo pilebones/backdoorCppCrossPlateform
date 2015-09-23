@@ -12,10 +12,10 @@
 
     class SocketClientProvider : public SocketProvider  {
 	public:
-        SocketClientProvider(int timeout = 50);
+        SocketClientProvider(string host,int port, int timeout = 50);
 		virtual ~SocketClientProvider();
 
-        bool connection(string host,int port);
+        bool connection();
         template <class T> void setTimeout(SOCKET handle, T timeout);
 	};
 
