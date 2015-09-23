@@ -12,6 +12,7 @@ SocketServerProvider::SocketServerProvider(string hostname, int port) : SocketPr
     bind(this->getSocket(), (SOCKADDR *)& socketAddrIn, sizeof(socketAddrIn));
     listen(this->getSocket(), 0);
 }
+
 /**
  * Sockets Destructor
  */
@@ -24,8 +25,9 @@ void SocketServerProvider::start() {
 
     while(1) {
         unsigned int socketAddrInClientSize = sizeof(socketAddrInClient);
-        if(socketClient = accept(this->getSocket(), (SOCKADDR *)&socketAddrInClient, &socketAddrInClientSize) != INVALID_SOCKET) {
+        if(INVALID_SOCKET!= (socketClient = accept(this->getSocket(), (SOCKADDR *)&socketAddrInClient, &socketAddrInClientSize))) {
             this->setSocketClient(socketClient);
+            this->setSocketAddrInClient(socketAddrInClient);
             send(this->getSocketClient(), "Welcome !\r\n", 11, 0);
         }
     }
