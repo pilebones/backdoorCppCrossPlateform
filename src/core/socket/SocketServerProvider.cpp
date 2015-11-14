@@ -24,8 +24,7 @@ void SocketServerProvider::start() {
     SOCKADDR_IN socketAddrInClient = this->getSocketAddrInClient();
 
     while(1) {
-        // unsigned int socketAddrInClientSize = sizeof(socketAddrInClient);
-        int socketAddrInClientSize = sizeof(socketAddrInClient);
+        socklen_t socketAddrInClientSize = sizeof(socketAddrInClient);
         if(INVALID_SOCKET != (socketClient = accept(this->getSocket(), (SOCKADDR *)&socketAddrInClient, &socketAddrInClientSize))) {
             this->setSocketClient(socketClient);
             this->setSocketAddrInClient(socketAddrInClient);

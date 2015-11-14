@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.3)
 project(backdoorCppCrossPlateform)
 message(STATUS "OS Detected : ${CMAKE_SYSTEM_NAME}")
 
-set(CMAKE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+# see :
+# CMake Move default directories => http://stackoverflow.com/questions/18826789/cmake-output-build-directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
+# Compilation settings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 IF(WIN32)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lws2_32 -lwsock32")
         set(CMAKE_GENERATOR "MinGW Makefiles")
@@ -19,10 +21,10 @@ IF(WIN32)
         set(BOOST_INCLUDEDIR "C:\\Boost\\include\\boost-1_59\\boost")
         set(BOOST_LIBRARYDIR "C:\\Boost\\lib")
         set(BOOST_ROOT "C:\\Boost")
-        set(Boost_USE_STATIC_LIBS ON)
-        set(Boost_USE_MULTITHREADED ON)
-        set(Boost_USE_STATIC_RUNTIME OFF)
         set(Boost_ADDITIONAL_VERSIONS "1.59")
+        # set(Boost_USE_STATIC_LIBS ON)
+        # set(Boost_USE_MULTITHREADED ON)
+        # set(Boost_USE_STATIC_RUNTIME OFF)
 
 ELSE()
     message("Unix OS Detected")

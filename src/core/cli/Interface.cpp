@@ -26,8 +26,10 @@ bool Interface::initProgramOptions() {
             ("version,V", "Display version of programme")
             ("verbose,v", "Enable mode verbose")
             ("listen,l", "Enable listen mode (server socket mode)")
-            ("port,p", po::value<int>()->required(), "Set port number to use")
-            ("host,H", po::value<string>()->required(), "Set hostname to use")
+            // ("port,p", po::value<int>()->required(), "Set port number to use")
+            // ("host,H", po::value<string>()->required(), "Set hostname to use")
+            ("port,p", po::value<int>(), "Set port number to use")
+            ("host,H", po::value<string>(), "Set hostname to use")
             ("input-file,f", po::value< vector<string> >(), "File wich conains query to send (doesn't work with -l option)")
             ;
 
@@ -64,9 +66,13 @@ bool Interface::initProgramOptions() {
             this->setFilePath(variablesMap["input-file"].as<string>());
         }
 
-        /*if (!variablesMap.count("port") || !variablesMap.count("host")) {
-            throw logic_error("You must define hostname and port to use");
-        }*/
+        if (!variablesMap.count("host")) {
+            throw logic_error("the option '--host|-H' is required but missing");
+        }
+
+        if (!variablesMap.count("port")) {
+            throw logic_error("the option '--port|-p' is required but missing");
+        }
 
         this->setHost(variablesMap["host"].as<string>());
         this->setPort(variablesMap["port"].as<int>());
