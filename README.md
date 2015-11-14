@@ -1,4 +1,4 @@
-# backdoorCppCrossPlateform
+# Backdoor C++ (Cross-Plateform)
 
 _/!\ Work in progress, not a stable release /!\_
 
