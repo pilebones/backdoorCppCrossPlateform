@@ -10,8 +10,7 @@ A fork of my own project named : "pilebones/backdoorBash" (see: https://github.c
 
 - CMake
 - Make
-- Boost C++ Library : https://cmake.org/download/
-- 
+- Boost C++ Library
 
 ###Windows
 - Download and install "MinGW" with gcc compiler (see: http://www.mingw.org/wiki/howto_install_the_mingw_gcc_compiler_suite)
