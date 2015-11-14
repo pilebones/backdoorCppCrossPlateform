@@ -5,17 +5,12 @@
 #ifndef CPPCROSSPLATEFORMSOCKETPROVIDER_INTERFACE_H
 #define CPPCROSSPLATEFORMSOCKETPROVIDER_INTERFACE_H
 
+    #include "../common/Constant.h"
     #include <boost/program_options.hpp>
     #include <iostream>
     #include <stdexcept>
     #include <string>
     #include <ctype.h>
-
-    #define VERSION 0.2
-    #define BUILD "2015-09-18"
-    #define PRODUCT_NAME "CppCrossPlateformSocketProvider"
-    #define AUTHOR "Pilebones"
-    #define CONTACT "http://www.mickael.franc.fr"
 
     using namespace std;
     using namespace boost::program_options;

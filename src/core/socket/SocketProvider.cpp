@@ -11,7 +11,7 @@ SocketProvider::SocketProvider(string hostname, int port) {
 
 #if defined(OS_Windows)
     WSADATA WSAData;
-		int error = WSAStartup(MAKEWORD(2,2), &WSAData);
+    int error = WSAStartup(MAKEWORD(2,2), &WSAData);
 #elif defined(OS_Linux)
     int error = 0;
 #endif
