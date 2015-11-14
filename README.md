@@ -8,8 +8,15 @@ A fork of my own project named : "pilebones/backdoorBash" (see: https://github.c
 
 ##Requirements
 
+- CMake
+- Make
+- Boost C++ Library : https://cmake.org/download/
+- 
+
 ###Windows
 - Download and install "MinGW" with gcc compiler (see: http://www.mingw.org/wiki/howto_install_the_mingw_gcc_compiler_suite)
+- Download and install CMake (see: 
+CMake : https://cmake.org/download/)
 - Download and install "Boost C++ library" >= v1.59.X (see: http://www.boost.org/users/download/)
 - After Boost C++ library installation : Build library for MinGW like below (see: http://www.boost.org/doc/libs/1_59_0/more/getting_started/unix-variants.html)
 ```bash
@@ -21,7 +28,7 @@ b2.exe install toolset=gcc
 ###Linux
 ```bash
 # Archlinux:
- pacman -S boost-libs boost
+pacman -S boost-libs boost
 # Debian/Ubuntu :
 (sudo) apt-get install libboost-dev
 ```
