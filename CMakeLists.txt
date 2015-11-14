@@ -27,7 +27,6 @@ IF(WIN32)
         # set(Boost_USE_STATIC_RUNTIME OFF)
 
 ELSE()
-    message("Unix OS Detected")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lboost_program_options")
 ENDIF(WIN32)
 
