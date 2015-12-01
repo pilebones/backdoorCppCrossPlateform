@@ -54,4 +54,12 @@ cmake . && make
 
 ##Usage
 
-_TODO_
+###Server mode
+```bash
+bin/main -p 12345 -H localhost -l
+```
+
+###Client mode
+```bash
+bin/main -p 12345 -H localhost
+```
