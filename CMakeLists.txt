@@ -48,20 +48,24 @@ endif()
 
 set(SOURCE_FILES
         src/main.cpp
+        src/core/cli/Interface.cpp
+        src/core/utils/Array.cpp
+        src/core/utils/Network.cpp
         src/core/socket/SocketProvider.cpp
         src/core/socket/SocketClientProvider.cpp
         src/core/socket/SocketServerProvider.cpp
-        src/core/utils/Array.cpp
-        src/core/cli/Interface.cpp
+        src/core/socket/SocketWrapper.cpp
 )
 
 set(HEADER_FILES
         src/core/common/Constant.h
+        src/core/cli/Interface.h
+        src/core/utils/Array.h
+        src/core/utils/Network.h
         src/core/socket/SocketProvider.h
         src/core/socket/SocketClientProvider.h
+        src/core/socket/SocketWrapper.h
         src/core/socket/SocketServerProvider.h
-        src/core/utils/Array.h
-        src/core/cli/Interface.h
 )
 
 add_executable(main ${SOURCE_FILES} ${HEADER_FILES})

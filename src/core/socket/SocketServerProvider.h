@@ -6,11 +6,13 @@
 #define CPPCROSSPLATEFORMSOCKETPROVIDER_SOCKETSERVERPROVIDER_H
 
 #include "SocketProvider.h"
+#include <map>
 
 using namespace std;
 
-class SocketServerProvider : public SocketProvider  {
+class SocketServerProvider : public SocketProvider {
 private:
+    map<string, SocketWrapper> socketClientMap;
     // TODO: Mono client pour le moment => à évoluer
     SOCKET socketClient;
     SOCKADDR_IN socketAddrInClient;
@@ -20,10 +22,15 @@ public:
 
     void start();
 
-    SOCKET getSocketClient();
-    SocketServerProvider & setSocketClient(SOCKET socketClient);
+    map<string, SocketWrapper> &getSocketClientMap();
+    SocketServerProvider &setSocketClientMap(map<string, SocketWrapper> socketClientMap);
 
-    SOCKADDR_IN getSocketAddrInClient();
-    SocketServerProvider & setSocketAddrInClient(SOCKADDR_IN socketAddrInClient);
+    bool writeToClientAsString(string clientSlug, string data);
+    SocketWrapper getSocketWrapperBySlug(string clientSlug);
+    bool hasSocketWrapperBySlug(string clientSlug);
+    void displayWelcomeToSocketWrapperBySlug(string clientSlug);
+
+    void addSocketClient(string token, SocketWrapper *socketClient);
+    SocketWrapper kickSocketClient(string token);
 };
 #endif //CPPCROSSPLATEFORMSOCKETPROVIDER_SOCKETSERVERPROVIDER_H

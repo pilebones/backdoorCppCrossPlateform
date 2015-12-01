@@ -17,12 +17,12 @@ SocketProvider::SocketProvider(string hostname, int port) {
 #endif
     if(!error) {
         // Create the socket
-        SocketProvider::setSocket(socket(AF_INET, SOCK_STREAM, 0));
+        this->setSocket(socket(AF_INET, SOCK_STREAM, 0));
 
         // Set up the file descriptor set.
         fd_set fds;
         FD_ZERO(&fds);
-        FD_SET(SocketProvider::getSocket(), &fds);
+        FD_SET(this->getSocket(), &fds);
 
         /* Connection settings */
         SOCKADDR_IN socketAddrIn;
@@ -40,36 +40,6 @@ SocketProvider::SocketProvider(string hostname, int port) {
  * Sockets Destructor
  */
 SocketProvider::~SocketProvider() {}
-
-/**
- * Resolv IP to do querying a valid target
- *
- * \param string hostname - IP or DNS record must be resolv
- */
-string SocketProvider::resolvAddress(string hostname) {
-    //setup address structure
-    if(-1 == inet_addr(hostname.c_str())) {
-        struct hostent *he;
-        struct in_addr **addr_list;
-        //resolve the hostname, its not an ip address
-        if ( NULL == (he = gethostbyname(hostname.c_str() ) )) {
-            //gethostbyname failed
-            throw logic_error("Unable to resolv hostname : " + hostname);
-        }
-
-        //Cast the h_addr_list to in_addr , since h_addr_list also has the ip address in long format only
-        addr_list = (struct in_addr **) he->h_addr_list;
-        string result;
-        for(int i = 0; addr_list[i] != NULL; i++) {
-            result = inet_ntoa(*addr_list[i]);
-            break;
-        }
-        return string(result);
-    }
-
-    //plain ip address
-    return hostname;
-}
 
 /**
  * Set socket to non-blocking mode
@@ -147,54 +117,4 @@ bool SocketProvider::writeAsString(string data) {
         return false;
     }
     return true;
-}
-
-/**
- * Getter for the socket
- *
- * \return SOCKET the socket
- */
-SOCKET SocketProvider::getSocket() {
-    return this->handle;
-}
-
-/**
- * Setter for the socket
- * \param SOCKET handle - Init socket
- */
-void SocketProvider::setSocket(SOCKET handle) {
-    this->handle = handle;
-}
-/**
- * Getter for the socket addr in
- *
- * \return SOCKADDR_IN the socket
- */
-SOCKADDR_IN SocketProvider::getSocketAddrIn() {
-    return this->socketAddrIn;
-}
-
-/**
- * Setter for the socket
- * \param SOCKADDR_IN socketAddrIn - Init socket addr in
- */
-void SocketProvider::setSocketAddrIn(SOCKADDR_IN socketAddrIn) {
-    this->socketAddrIn = socketAddrIn;
-}
-
-/**
- * Getter for the socket addr in
- *
- * \return SOCKADDR_IN the socket
- */
-SOCKADDR SocketProvider::getSocketAddr() {
-    return this->socketAddr;
-}
-
-/**
- * Setter for the socket
- * \param SOCKADDR socketAddr - Init socket addr
- */
-void SocketProvider::setSocketAddr(SOCKADDR socketAddr) {
-    this->socketAddr = socketAddr;
 }

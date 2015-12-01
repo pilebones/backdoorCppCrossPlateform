@@ -35,13 +35,14 @@ int main(int argc, const char** argv) {
         if (verbose) cout << "Init server mode : feature not fully implemented yet work in progress" << endl;
         // Init provider
         SocketServerProvider* server = new SocketServerProvider(host, port);
+        cout << "Listening on " << host << ":" << port << endl;
         server->start();
     } else {
         if (verbose) cout << "Init client mode" << endl;
         try {
 
             // Resolv target before connect
-            string hostname = SocketClientProvider::resolvAddress(host);
+            string hostname = Network::resolvAddress(host);
             if (host != hostname) {
                 cout << "Target resolved to " << hostname << endl;
             }
@@ -59,8 +60,7 @@ int main(int argc, const char** argv) {
                     cout << endl << data << endl;
                 }
 
-                cout << "Please input what you want to send..." << endl;
-                cout << "> ";
+                cout << "Please input what you want to send..." << endl << "> ";
 
                 string raw;
                 char const crlf[] = "\x0D\x0A";

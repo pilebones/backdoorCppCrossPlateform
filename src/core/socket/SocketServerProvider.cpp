@@ -20,33 +20,96 @@ SocketServerProvider::~SocketServerProvider() {}
 
 void SocketServerProvider::start() {
 
-    SOCKET socketClient = this->getSocketClient();
-    SOCKADDR_IN socketAddrInClient = this->getSocketAddrInClient();
+    SocketWrapper * socketWrapper = new SocketWrapper();
+    SOCKADDR_IN socketAddrIn = socketWrapper->getSocketAddrIn();
 
     while(1) {
-        socklen_t socketAddrInClientSize = sizeof(socketAddrInClient);
-        if(INVALID_SOCKET != (socketClient = accept(this->getSocket(), (SOCKADDR *)&socketAddrInClient, &socketAddrInClientSize))) {
-            this->setSocketClient(socketClient);
-            this->setSocketAddrInClient(socketAddrInClient);
-            send(this->getSocketClient(), "Welcome !\r\n", 11, 0);
+        socklen_t socketAddrInClientSize = sizeof(socketAddrIn);
+        socketWrapper->setSocket(accept(this->getSocket(), (SOCKADDR *)&socketAddrIn, &socketAddrInClientSize));
+
+        if(INVALID_SOCKET != socketWrapper->getSocket()) {
+            this->addSocketClient(socketWrapper->getSlug(), socketWrapper);
+            this->displayWelcomeToSocketWrapperBySlug(socketWrapper->getSlug());
         }
     }
 }
 
-SOCKET SocketServerProvider::getSocketClient() {
-    return this->socketClient;
+SocketWrapper SocketServerProvider::getSocketWrapperBySlug(string clientSlug) {
+    if(!this->hasSocketWrapperBySlug(clientSlug)) {
+        ostringstream stream;
+        stream << "No client for slug : " << clientSlug;
+
+        throw logic_error(stream.str());
+    }
+
+    SocketWrapper socketWrapper = this->getSocketClientMap().find(clientSlug)->second;
+    return socketWrapper;
 }
 
-SocketServerProvider & SocketServerProvider::setSocketClient(SOCKET socketClient) {
-    this->socketClient = socketClient;
-    return *this;
+void SocketServerProvider::displayWelcomeToSocketWrapperBySlug(string clientSlug) {
+
+    SocketWrapper socketWrapper = this->getSocketWrapperBySlug(clientSlug);
+    ostringstream stream;
+    stream
+    << "Welcome client ID \"" << socketWrapper.getSlug() << '\"' << endl
+    << this->getSocketClientMap().size() << " User(s) connected :" << endl;
+
+    map <string, SocketWrapper>::iterator iterator;
+    for(iterator = this->getSocketClientMap().begin(); iterator != this->getSocketClientMap().end(); iterator++)
+    {
+        stream << "- ID : " << (*iterator).first << " / <IP:PORT> : " << (*iterator).second.getIp() << ":" << (*iterator).second.getPort();
+        if ((*iterator).first == socketWrapper.getSlug()) {
+            stream << " (you)" ;
+        }
+        stream << endl;
+    }
+
+    this->writeToClientAsString(socketWrapper.getSlug(), stream.str());
 }
 
-SOCKADDR_IN SocketServerProvider::getSocketAddrInClient() {
-    return this->socketAddrInClient;
+bool SocketServerProvider::hasSocketWrapperBySlug(string clientSlug) {
+    if(!this->getSocketClientMap().empty())
+    {
+        if(this->getSocketClientMap().find(clientSlug)->first != clientSlug)
+        {
+            return false;
+        }
+        else
+            return true;
+    }
+    return false;
 }
 
-SocketServerProvider & SocketServerProvider::setSocketAddrInClient(SOCKADDR_IN socketAddrInClient) {
-    this->socketAddrInClient = socketAddrInClient;
-    return *this;
+map<string, SocketWrapper> & SocketServerProvider::getSocketClientMap() {
+    return this->socketClientMap;
+};
+
+SocketServerProvider & SocketServerProvider::setSocketClientMap(map<string, SocketWrapper> socketClientMap) {
+    this->socketClientMap = socketClientMap;
+    return * this;
+}
+
+void SocketServerProvider::addSocketClient(string clientSlug, SocketWrapper * socketClient) {
+    this->getSocketClientMap().insert(pair<string,SocketWrapper>(clientSlug, * socketClient));
+}
+
+SocketWrapper SocketServerProvider::kickSocketClient(string clientSlug) {
+    this->getSocketClientMap().erase(clientSlug);
+}
+
+/**
+ * Put data to the opened socket
+ */
+bool SocketServerProvider::writeToClientAsString(string clientSlug, string data) {
+
+    if(-1 == send(
+        this->getSocketWrapperBySlug(clientSlug).getSocket(),
+        data.c_str(),
+        data.length(),
+        0
+    )) {
+        perror("Send failed. Error");
+        return false;
+    }
+    return true;
 }
