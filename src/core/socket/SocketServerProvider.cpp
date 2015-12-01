@@ -10,7 +10,10 @@
 SocketServerProvider::SocketServerProvider(string hostname, int port) : SocketProvider(hostname, port) {
     SOCKADDR_IN socketAddrIn = this->getSocketAddrIn();
     bind(this->getSocket(), (SOCKADDR *)& socketAddrIn, sizeof(socketAddrIn));
-    listen(this->getSocket(), 0);
+    int returnCode = listen(this->getSocket(), 0);
+    if(-1 == returnCode) {
+        throw logic_error("Unable to listen on this port !");
+    }
 }
 
 /**
@@ -63,8 +66,23 @@ void SocketServerProvider::displayWelcomeToSocketWrapperBySlug(string clientSlug
         }
         stream << endl;
     }
+    cout << stream.str();
 
     this->writeToClientAsString(socketWrapper.getSlug(), stream.str());
+
+    ostringstream streamToBroadcast;
+    streamToBroadcast
+        << endl
+        << ">>>> Broadcasted Message <<<<" << endl
+        << "/!\\ Another client join server : " << endl
+        << " - ID       = " << socketWrapper.getSocket() << endl
+        << " - IP/PORT  = " << socketWrapper.getIp() << ":" << socketWrapper.getPort() << endl
+        << ">>>> END Broadcasted Message <<<<" << endl
+        << endl;
+
+    this->broadcastMessage(streamToBroadcast.str());
+
+    cout << streamToBroadcast.str();
 }
 
 bool SocketServerProvider::hasSocketWrapperBySlug(string clientSlug) {
@@ -112,4 +130,14 @@ bool SocketServerProvider::writeToClientAsString(string clientSlug, string data)
         return false;
     }
     return true;
+}
+
+void SocketServerProvider::broadcastMessage(string data) {
+
+    map <string, SocketWrapper>::iterator iterator;
+    for(iterator = this->getSocketClientMap().begin(); iterator != this->getSocketClientMap().end(); iterator++)
+    {
+        SocketWrapper socketWrapper = (*iterator).second;
+        this->writeToClientAsString(socketWrapper.getSlug(), data);
+    }
 }
