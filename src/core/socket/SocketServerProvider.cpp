@@ -34,6 +34,8 @@ void SocketServerProvider::start() {
             this->addSocketClient(socketWrapper->getSlug(), socketWrapper);
             this->displayWelcomeToSocketWrapperBySlug(socketWrapper->getSlug());
         }
+
+        // this->manageQueries();
     }
 }
 
@@ -47,6 +49,18 @@ SocketWrapper SocketServerProvider::getSocketWrapperBySlug(string clientSlug) {
 
     SocketWrapper socketWrapper = this->getSocketClientMap().find(clientSlug)->second;
     return socketWrapper;
+}
+
+void SocketServerProvider::manageQueries() {
+
+    map <string, SocketWrapper>::iterator iterator;
+    for(iterator = this->getSocketClientMap().begin(); iterator != this->getSocketClientMap().end(); iterator++)
+    {
+        string message = this->readFromClientAsString((*iterator).second.getSlug());
+        if (message.length() > 0) {
+            cout << "Message From " << (*iterator).first << message << endl;
+        }
+    }
 }
 
 void SocketServerProvider::displayWelcomeToSocketWrapperBySlug(string clientSlug) {
@@ -116,20 +130,67 @@ SocketWrapper SocketServerProvider::kickSocketClient(string clientSlug) {
 }
 
 /**
- * Put data to the opened socket
+ * Put data to the opened socket client
  */
 bool SocketServerProvider::writeToClientAsString(string clientSlug, string data) {
 
     if(-1 == send(
-        this->getSocketWrapperBySlug(clientSlug).getSocket(),
-        data.c_str(),
-        data.length(),
-        0
+            this->getSocketWrapperBySlug(clientSlug).getSocket(),
+            data.c_str(),
+            data.length(),
+            0
     )) {
         perror("Send failed. Error");
         return false;
     }
     return true;
+}
+
+/**
+ * Read data to the opened socket client
+ */
+string SocketServerProvider::readFromClientAsString(string clientSlug) {
+    SOCKET clientSocket = this->getSocketWrapperBySlug(clientSlug).getSocket();
+    string response;
+    char buffer[BUFFER_POOL_LENGHT];
+    ssize_t nbBytes = 0;
+    bool toContinue = true;
+
+    while (toContinue) {
+        // 	nbBytes = recv(this->getSocket(), buffer, 1, 0); // Previously : read bytes by bytes until the end
+        nbBytes = recv(clientSocket, buffer, sizeof(buffer) - 1, 0); // Blocking sys-call by default
+        if (0 == nbBytes) { // No data receive
+            toContinue = false;
+        } else if (nbBytes > 0) { // Data has been received
+            buffer[nbBytes] = '\0'; // Terminate buffer
+            response += string(buffer);
+        } else { // There is an error => what it is
+            int errorNumber = errno; // Save errno to avoid data lost
+            switch (errorNumber) {
+#if defined(OS_Windows)
+                case 0: // No data receive on Windows
+                    toContinue = false;
+                    break;
+                case WSAEWOULDBLOCK: // Socket is NONBLOCK and there is no data available
+                    toContinue = false;
+                    break;
+#elif defined (OS_Linux)
+                case EWOULDBLOCK: // There is no data available for reading on a non-blocking socket => should run the recv() again
+                    toContinue = false;
+                    break;
+#endif
+                case EINTR: // An interrupt (signal) has been catched => should be ingore in most cases
+                    break;
+                default: // socket has an error, no valid anymore
+                    cerr << "Error number : " << errorNumber << "(" << nbBytes << " bytes receive)" << endl;
+                    perror("Receive failed. ");
+                    toContinue = false;
+                    break;
+            }
+        }
+    }
+
+    return response;
 }
 
 void SocketServerProvider::broadcastMessage(string data) {

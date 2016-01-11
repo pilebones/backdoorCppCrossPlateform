@@ -50,7 +50,9 @@ void SocketProvider::setNonBlock() {
             flags |= O_NONBLOCK;
             fcntl(this->getSocket(), F_SETFL, flags);
     #endif
-}/**
+}
+
+/**
  * Read data from the opened socket
  *
  * \return string - data read

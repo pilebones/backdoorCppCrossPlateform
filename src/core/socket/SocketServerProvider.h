@@ -26,6 +26,8 @@ public:
     SocketServerProvider &setSocketClientMap(map<string, SocketWrapper> socketClientMap);
 
     bool writeToClientAsString(string clientSlug, string data);
+    string readFromClientAsString(string clientSlug);
+    void manageQueries();
     void broadcastMessage(string data);
     SocketWrapper getSocketWrapperBySlug(string clientSlug);
     bool hasSocketWrapperBySlug(string clientSlug);

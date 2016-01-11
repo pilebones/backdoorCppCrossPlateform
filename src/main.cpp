@@ -42,6 +42,7 @@ int main(int argc, const char** argv) {
         try {
 
             // Resolv target before connect
+            // TODO: [ISSUE] Host automatically resolved => Unable to connect to "localhost" but "127.0.0.1" works
             string hostname = Network::resolvAddress(host);
             if (host != hostname) {
                 cout << "Target resolved to " << hostname << endl;
