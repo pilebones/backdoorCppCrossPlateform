@@ -44,12 +44,16 @@ SocketProvider::~SocketProvider() {}
 /**
  * Set socket to non-blocking mode
  */
+void SocketProvider::setSocketNonBlock(SOCKET sock) {
+#if defined(OS_Linux)
+    int flags = fcntl(sock, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    fcntl(sock, F_SETFL, flags);
+#endif
+}
+
 void SocketProvider::setNonBlock() {
-    #if defined(OS_Linux)
-        int flags = fcntl(this->getSocket(), F_GETFL, 0);
-            flags |= O_NONBLOCK;
-            fcntl(this->getSocket(), F_SETFL, flags);
-    #endif
+    this->setSocketNonBlock(this->getSocket());
 }
 
 /**
@@ -57,20 +61,20 @@ void SocketProvider::setNonBlock() {
  *
  * \return string - data read
  */
-string SocketProvider::readAsString(bool nonBlockingMode) {
+string SocketProvider::readSocketAsString(SOCKET sock, bool nonBlockingMode) {
 
-    string response;
+    string response = "";
     char buffer[BUFFER_POOL_LENGHT];
     ssize_t nbBytes = 0;
     bool toContinue = true;
 
     if (nonBlockingMode) {
-        this->setNonBlock();
+        this->setSocketNonBlock(sock);
     }
 
     while (toContinue) {
-        // 	nbBytes = recv(this->getSocket(), buffer, 1, 0); // Previously : read bytes by bytes until the end
-        nbBytes = recv(this->getSocket(), buffer, sizeof(buffer) - 1, 0); // Blocking sys-call by default
+        // 	nbBytes = recv(sock, buffer, 1, 0); // Previously : read bytes by bytes until the end
+        nbBytes = recv(sock, buffer, sizeof(buffer) - 1, 0); // Blocking sys-call by default
         if (0 == nbBytes) { // No data receive
             toContinue = false;
         } else if (nbBytes > 0) { // Data has been received
@@ -105,12 +109,16 @@ string SocketProvider::readAsString(bool nonBlockingMode) {
     return response;
 }
 
+string SocketProvider::readAsString(bool nonBlockingMode) {
+    return this->readSocketAsString(this->getSocket(), nonBlockingMode);
+}
+
 /**
  * Put data to the opened socket
  */
-bool SocketProvider::writeAsString(string data) {
+bool SocketProvider::writeSocketAsString(SOCKET sock, string data) {
     if(-1 == send(
-            this->getSocket(),
+            sock,
             data.c_str(),
             data.length(),
             0
@@ -119,4 +127,11 @@ bool SocketProvider::writeAsString(string data) {
         return false;
     }
     return true;
+}
+
+/**
+ * Put data to the opened socket
+ */
+bool SocketProvider::writeAsString(string data) {
+    return this->writeSocketAsString(this->getSocket(), data);
 }

@@ -9,8 +9,17 @@
  */
 SocketServerProvider::SocketServerProvider(string hostname, int port) : SocketProvider(hostname, port) {
     SOCKADDR_IN socketAddrIn = this->getSocketAddrIn();
-    bind(this->getSocket(), (SOCKADDR *)& socketAddrIn, sizeof(socketAddrIn));
-    int returnCode = listen(this->getSocket(), 0);
+
+    // Check if the port is still treated as "being in use" by the OS
+    int reuse = 1;
+    int returnCode = setsockopt(this->getSocket(), SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+    if (0 == returnCode) {
+        returnCode = bind(this->getSocket(), (SOCKADDR *)& socketAddrIn, sizeof(socketAddrIn));
+    } else {
+        // cerr << "The port is still treated as \"being in use\" by the OS" << endl;
+    }
+
+    returnCode = listen(this->getSocket(), 0);
     if(-1 == returnCode) {
         throw logic_error("Unable to listen on this port !");
     }
@@ -21,6 +30,9 @@ SocketServerProvider::SocketServerProvider(string hostname, int port) : SocketPr
  */
 SocketServerProvider::~SocketServerProvider() {}
 
+/**
+ * Start the server bound to the host:port passed to the constructor
+ */
 void SocketServerProvider::start() {
 
     SocketWrapper * socketWrapper = new SocketWrapper();
@@ -31,14 +43,18 @@ void SocketServerProvider::start() {
         socketWrapper->setSocket(accept(this->getSocket(), (SOCKADDR *)&socketAddrIn, &socketAddrInClientSize));
 
         if(INVALID_SOCKET != socketWrapper->getSocket()) {
+            cout << "[Connection] New client : "<< socketWrapper->getSlug() << endl;
             this->addSocketClient(socketWrapper->getSlug(), socketWrapper);
             this->displayWelcomeToSocketWrapperBySlug(socketWrapper->getSlug());
         }
 
-        // this->manageQueries();
+        this->manageQueries();
     }
 }
 
+/**
+ * Return the client object if a client related to slug in parameter is connected
+ */
 SocketWrapper SocketServerProvider::getSocketWrapperBySlug(string clientSlug) {
     if(!this->hasSocketWrapperBySlug(clientSlug)) {
         ostringstream stream;
@@ -51,6 +67,9 @@ SocketWrapper SocketServerProvider::getSocketWrapperBySlug(string clientSlug) {
     return socketWrapper;
 }
 
+/**
+ * Read All client sockets and display message if receive
+ */
 void SocketServerProvider::manageQueries() {
 
     map <string, SocketWrapper>::iterator iterator;
@@ -58,11 +77,16 @@ void SocketServerProvider::manageQueries() {
     {
         string message = this->readFromClientAsString((*iterator).second.getSlug());
         if (message.length() > 0) {
-            cout << "Message From " << (*iterator).first << message << endl;
+            cout << "[Message][Client][" << (*iterator).first << "] " << message << endl;
+        } else {
+            // cout << "No message from " << (*iterator).first << endl;
         }
     }
 }
 
+/**
+ * Sent to a connected client the welcome message
+ */
 void SocketServerProvider::displayWelcomeToSocketWrapperBySlug(string clientSlug) {
 
     SocketWrapper socketWrapper = this->getSocketWrapperBySlug(clientSlug);
@@ -80,7 +104,9 @@ void SocketServerProvider::displayWelcomeToSocketWrapperBySlug(string clientSlug
         }
         stream << endl;
     }
-    cout << stream.str();
+
+    // cout << stream.str();
+    cout << "[Message][Server]["<< socketWrapper.getSlug() << "] Connected users list message" << endl;
 
     this->writeToClientAsString(socketWrapper.getSlug(), stream.str());
 
@@ -96,9 +122,13 @@ void SocketServerProvider::displayWelcomeToSocketWrapperBySlug(string clientSlug
 
     this->broadcastMessage(streamToBroadcast.str());
 
-    cout << streamToBroadcast.str();
+    // cout << streamToBroadcast.str();
+    cout << "[Message][Server][Broadcast] Welcome message" << endl;
 }
 
+/**
+ * Return true if a client related to slug in parameter is connected
+ */
 bool SocketServerProvider::hasSocketWrapperBySlug(string clientSlug) {
     if(!this->getSocketClientMap().empty())
     {
@@ -121,10 +151,16 @@ SocketServerProvider & SocketServerProvider::setSocketClientMap(map<string, Sock
     return * this;
 }
 
+/**
+ * Add client socket to the list of client
+ */
 void SocketServerProvider::addSocketClient(string clientSlug, SocketWrapper * socketClient) {
     this->getSocketClientMap().insert(pair<string,SocketWrapper>(clientSlug, * socketClient));
 }
 
+/**
+ * Kick a connected client
+ */
 SocketWrapper SocketServerProvider::kickSocketClient(string clientSlug) {
     this->getSocketClientMap().erase(clientSlug);
 }
@@ -133,66 +169,23 @@ SocketWrapper SocketServerProvider::kickSocketClient(string clientSlug) {
  * Put data to the opened socket client
  */
 bool SocketServerProvider::writeToClientAsString(string clientSlug, string data) {
-
-    if(-1 == send(
-            this->getSocketWrapperBySlug(clientSlug).getSocket(),
-            data.c_str(),
-            data.length(),
-            0
-    )) {
-        perror("Send failed. Error");
-        return false;
-    }
-    return true;
+    SocketWrapper socketWrapper = this->getSocketWrapperBySlug(clientSlug);
+    SOCKET clientSocket = socketWrapper.getSocket();
+    return this->writeSocketAsString(clientSocket, data);
 }
 
 /**
  * Read data to the opened socket client
  */
 string SocketServerProvider::readFromClientAsString(string clientSlug) {
-    SOCKET clientSocket = this->getSocketWrapperBySlug(clientSlug).getSocket();
-    string response;
-    char buffer[BUFFER_POOL_LENGHT];
-    ssize_t nbBytes = 0;
-    bool toContinue = true;
-
-    while (toContinue) {
-        // 	nbBytes = recv(this->getSocket(), buffer, 1, 0); // Previously : read bytes by bytes until the end
-        nbBytes = recv(clientSocket, buffer, sizeof(buffer) - 1, 0); // Blocking sys-call by default
-        if (0 == nbBytes) { // No data receive
-            toContinue = false;
-        } else if (nbBytes > 0) { // Data has been received
-            buffer[nbBytes] = '\0'; // Terminate buffer
-            response += string(buffer);
-        } else { // There is an error => what it is
-            int errorNumber = errno; // Save errno to avoid data lost
-            switch (errorNumber) {
-#if defined(OS_Windows)
-                case 0: // No data receive on Windows
-                    toContinue = false;
-                    break;
-                case WSAEWOULDBLOCK: // Socket is NONBLOCK and there is no data available
-                    toContinue = false;
-                    break;
-#elif defined (OS_Linux)
-                case EWOULDBLOCK: // There is no data available for reading on a non-blocking socket => should run the recv() again
-                    toContinue = false;
-                    break;
-#endif
-                case EINTR: // An interrupt (signal) has been catched => should be ingore in most cases
-                    break;
-                default: // socket has an error, no valid anymore
-                    cerr << "Error number : " << errorNumber << "(" << nbBytes << " bytes receive)" << endl;
-                    perror("Receive failed. ");
-                    toContinue = false;
-                    break;
-            }
-        }
-    }
-
-    return response;
+    SocketWrapper socketWrapper = this->getSocketWrapperBySlug(clientSlug);
+    SOCKET clientSocket = socketWrapper.getSocket();
+    return this->readSocketAsString(clientSocket);
 }
 
+/**
+ * Put data to every client socket
+ */
 void SocketServerProvider::broadcastMessage(string data) {
 
     map <string, SocketWrapper>::iterator iterator;
