@@ -31,22 +31,21 @@ int main(int argc, const char** argv) {
     bool verbose    = cli->isModeVerboseEnabled();
     bool modeListen = cli->isModeListenEnabled();
 
+    // Resolv target before create socket client or server
+    string hostname = Network::resolvAddress(host);
+    if (host != hostname) {
+        cout << "Target resolved to " << hostname << endl;
+    }
+
     if (modeListen) {
         if (verbose) cout << "Init server mode : feature not fully implemented yet work in progress" << endl;
         // Init provider
-        SocketServerProvider* server = new SocketServerProvider(host, port);
-        cout << "Listening on " << host << ":" << port << endl;
+        SocketServerProvider* server = new SocketServerProvider(hostname, port);
+        cout << "Listening on " << hostname << ":" << port << endl;
         server->start();
     } else {
         if (verbose) cout << "Init client mode" << endl;
         try {
-
-            // Resolv target before connect
-            // TODO: [ISSUE] Host automatically resolved => Unable to connect to "localhost" but "127.0.0.1" works
-            string hostname = Network::resolvAddress(host);
-            if (host != hostname) {
-                cout << "Target resolved to " << hostname << endl;
-            }
 
             // Init provider
             SocketClientProvider* client = new SocketClientProvider(hostname, port, SOCKET_TIMEOUT);
