@@ -28,7 +28,15 @@ SocketServerProvider::SocketServerProvider(string hostname, int port) : SocketPr
 /**
  * Sockets Destructor
  */
-SocketServerProvider::~SocketServerProvider() {}
+SocketServerProvider::~SocketServerProvider() {
+    /* Close socket with same function name for each OS (see: macro inside *.h) */
+    closesocket(this->getSocket());
+
+    /* Close only on Windows socket extra-setting */
+    #if defined(OS_Windows)
+        WSACleanup();
+    #endif
+}
 
 /**
  * Start the server bound to the host:port passed to the constructor
